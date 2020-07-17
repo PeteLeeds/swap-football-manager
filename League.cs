@@ -20,25 +20,25 @@ namespace FootballTeamCSharp
             setSchedule();
         }
 
-        public League(string name, int noTeams, int high, int low)
+        public League(string name, int noTeams, int low, int high)
         {
             this.name = name;
             this.board = new List<Team>();
             for (int i = 0; i < noTeams; i++)
             {
-                board.Add(new Team(name + " Team " + i, high, low, this));
+                board.Add(new Team(name + " Team " + i, low, high, this));
             }
             setSchedule();
         }
 
-        public League(string name, int noTeams, int high, int low, string userTeam)
+        public League(string name, int noTeams, int low, int high, string userTeam)
         {
             this.name = name;
             this.board = new List<Team>();
-            board.Add(new UserTeam(userTeam, high, low, this));
+            board.Add(new UserTeam(userTeam, low + 3, high, this));
             for (int i = 0; i < noTeams - 1; i++)
             {
-                board.Add(new Team(name + " Team " + i, high, low, this));
+                board.Add(new Team(name + " Team " + i, low, high, this));
             }
             setSchedule();
         }
@@ -48,10 +48,12 @@ namespace FootballTeamCSharp
             schedule.Clear();
             for (int i = 0; i < (board.Count - 1) * 2; i++)
             {
+                //Adding the matches for a given gameweek
                 schedule.Add(new List<Match>());
                 for (int j = 0; j < board.Count / 2; j++) {
                     schedule[i].Add(new Match(board[j], board[(board.Count / 2) + j]));
                 }
+                //Rotating the teams
                 Team temp = board[board.Count / 2 - 1];
                 Team temp2 = board[board.Count / 2];
                 for (int j = (board.Count - 1) / 2; j > 1; j--) {

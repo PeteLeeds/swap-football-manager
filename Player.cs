@@ -7,7 +7,7 @@ namespace FootballTeamCSharp
     class Player
     {
         string firstName, surname, pos;
-        int skill;
+        int skill, fitness;
         bool protect = false;
         Random rnd = new Random();
 
@@ -59,6 +59,20 @@ namespace FootballTeamCSharp
         {
             get { return this.protect; }
             set { this.protect = value; }
+        }
+
+        public int Fitness
+        {
+            get { return this.fitness; }
+            set { if ((pos != "GK" || rnd.Next(2) == 1 || value == 100)) {
+                    this.fitness = value;
+                }
+            }
+        }
+
+        public int PlayingSkill
+        {
+            get { return (this.Skill * this.Fitness / 100); }
         }
 
         public override string ToString()

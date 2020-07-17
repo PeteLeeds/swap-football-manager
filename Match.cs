@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Windows.Input;
 
 namespace FootballTeamCSharp
 {
@@ -60,6 +61,26 @@ namespace FootballTeamCSharp
             outcome();
         }
 
+        public Boolean oneVOne(Player player1, Player player2)
+        {
+            player1.Fitness--;
+            player2.Fitness--;
+            return(player1.PlayingSkill + (rnd.Next(20) - 10) > player2.PlayingSkill + (rnd.Next(20) - 10));
+        }
+
+        public void inMatchMenu()
+        {
+            Console.WriteLine("In-Match menu\nPress 1 to make a substitution\n" +
+                "Press any other key to return to the game\nPlease Select");
+            string choice = Console.ReadLine();
+            if (choice == "1")
+            {
+                if (typeof(UserTeam) == team1.GetType()) { team1.Squad.makeSubstitution(); }
+                else { team2.Squad.makeSubstitution(); }
+                inMatchMenu();
+            }
+        }
+
         public void play()
         {
             Console.WriteLine(team1.Name + " vs " + team2.Name);
@@ -74,13 +95,24 @@ namespace FootballTeamCSharp
                 team2.setMatchSquad();
                 team1.autoSquad();
             }
+            team1.resetFitness();
+            team2.resetFitness();
             for (int i = 1; i <= 90; i++)
             {
                 Console.WriteLine(i);
+                if (i % 4 == 0)
+                {
+                    team1.Squad.tirePlayers();
+                    team2.Squad.tirePlayers();
+                }
+                if (i % 15 == 0 && i != 90)
+                {
+                    inMatchMenu();
+                }
                 if (rnd.Next(10) > 7)
                 {
                     Player p1 = team1.Squad.random("MID"), p2 = team2.Squad.random("MID");
-                    if (p1.Skill + (rnd.Next(10) - 5) > p2.Skill + (rnd.Next(10) - 5))
+                    if (oneVOne(p1, p2))
                     {
                         Console.WriteLine(p1.Surname + " has the ball for " + team1.Name);
                         if (opportunity(team2.Squad.Gk, team2.Squad.random("DEF"), p1, team1.Squad.random("FW")))
@@ -107,17 +139,17 @@ namespace FootballTeamCSharp
 
         public bool opportunity(Player gk, Player def, Player mid, Player att)
         {
-            if (mid.Skill + (rnd.Next(10) - 5) > def.Skill + (rnd.Next(10) - 5))
+            if (oneVOne(mid, def))
             {
                 Thread.Sleep(200);
                 Console.WriteLine("He kicks the ball to " + att.Surname);
                 Thread.Sleep(500);
-                if (rnd.Next(100) > att.Skill / 2)
+                if (rnd.Next(100) > att.PlayingSkill)
                 {
                     Console.WriteLine("He Missed!");
                     return false;
                 }
-                else if (att.Skill > gk.Skill + rnd.Next(15) - 10)
+                else if (oneVOne(att, gk))
                 {
                     Console.WriteLine("GOAL!");
                     Thread.Sleep(200);

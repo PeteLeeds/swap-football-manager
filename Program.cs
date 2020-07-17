@@ -71,16 +71,17 @@ namespace FootballTeamCSharp
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Please enter the name of your team: ");
             List<League> leagues = new List<League>();
             for (int i = 1; i < 5; i++)
             {
                 if (i == 3)
                 {
-                    leagues.Add(new League("League 3", 20, 50, 70, "Fishtank FC"));
+                    leagues.Add(new League("League 3", 20, 56, 74, Console.ReadLine()));
                 }
                 else
                 {
-                    leagues.Add(new League("League " + i, 20, (80 - i * 10), (100 - i * 10)));
+                    leagues.Add(new League("League " + i, 20, (80 - i * 8), (98 - i * 8)));
                 }
                 if (!(i==1))
                 {

@@ -30,7 +30,7 @@ namespace FootballTeamCSharp
             autoProtect();
         }
 
-        public Team(string name, int high, int low, League league)
+        public Team(string name, int low, int high, League league)
         {
             this.name = name;
             this.league = league;
@@ -38,12 +38,12 @@ namespace FootballTeamCSharp
             players = new List<Player>();
             for (int i = 0; i < 11; i++)
             {
-                players.Add(new Player(high, low, Program.positions[i]));
+                players.Add(new Player(low, high, Program.positions[i]));
             }
             //Adds substitutes
             for (int i = 0; i < 5; i++)
             {
-                players.Add(new Player(high, low, Program.positions[rnd.Next(Program.positions.Length)]));
+                players.Add(new Player(low, high, Program.positions[rnd.Next(Program.positions.Length)]));
             }
             autoProtect();
             autoSquad();
@@ -147,37 +147,28 @@ namespace FootballTeamCSharp
             squad.clear();
             players = players.OrderByDescending(o => o.Skill).ToList();
             int confirmed = 0, index = 0;
-            while (confirmed < 11 && index < players.Count)
+            while (index < players.Count)
             {
-                switch (players[index].Pos)
+                if (players[index].Pos == "GK" && squad.Gk == null)
                 {
-                    case "GK":
-                        if (squad.Gk == null) {
-                            squad.Gk = players[index];
-                            confirmed++;
-                        }
-                        break;
-                    case "DEF":
-                        if (squad.Defs.Count < 4)
-                        {
-                            squad.Defs.Add(players[index]);
-                            confirmed++;
-                        }
-                        break;
-                    case "MID":
-                        if (squad.Mids.Count < 4)
-                        {
-                            squad.Mids.Add(players[index]);
-                            confirmed++;
-                        }
-                        break;
-                    case "FW":
-                        if (squad.Fws.Count < 2)
-                        {
-                            squad.Fws.Add(players[index]);
-                            confirmed++;
-                        }
-                        break;
+                    squad.Gk = players[index];
+                    confirmed++;
+                }
+                else if (players[index].Pos == "DEF" && squad.Defs.Count < 4) {
+                    squad.Defs.Add(players[index]);
+                    confirmed++;
+                }
+                else if (players[index].Pos == "MID" && squad.Mids.Count < 4) {
+                    squad.Mids.Add(players[index]);
+                    confirmed++;
+                }
+                else if (players[index].Pos == "FW" && squad.Fws.Count < 2) {
+                    squad.Fws.Add(players[index]);
+                    confirmed++;
+                }
+                else
+                {
+                    squad.Substitutes.Add(players[index]);
                 }
                 index++;
             }
@@ -206,19 +197,8 @@ namespace FootballTeamCSharp
         public void sortTeam()
             /** Sorts the MatchSquad above the rest of the team */
         {
-            List<Player> matchSquad = new List<Player> { squad.Gk };
-            matchSquad.AddRange(squad.Defs);
-            matchSquad.AddRange(squad.Mids);
-            matchSquad.AddRange(squad.Fws);
-            List<Player> reserves = new List<Player>();
-            for (int i = 0; i < players.Count; i++)
-            {
-                if (!(matchSquad.Contains(players[i]))) {
-                    reserves.Add(players[i]);
-                }
-            }
-            players = matchSquad;
-            players.AddRange(reserves);
+            players = squad.PlayersOnField;
+            players.AddRange(squad.Substitutes);
         }
 
         public void setMatchSquad()
@@ -226,20 +206,19 @@ namespace FootballTeamCSharp
             squad.clear();
             for (int i = 0; i < 11; i++)
             {
-                switch (players[i].Pos) {
-                    case "GK":
-                        squad.Gk = players[i];
-                        break;
-                    case "DEF":
-                        squad.Defs.Add(players[i]);
-                        break;
-                    case "MID":
-                        squad.Mids.Add(players[i]);
-                        break;
-                    case "FW":
-                        squad.Fws.Add(players[i]);
-                        break;
+                List<Player> list = squad.returnOutfieldPosition(players[i].Pos);
+                if (list == null)
+                {
+                    squad.Gk = players[i];
                 }
+                else
+                {
+                    list.Add(players[i]);
+                }
+            }
+            for (int i = 11; i < players.Count; i++)
+            {
+                squad.Substitutes.Add(players[i]);
             }
         }
 
@@ -276,8 +255,17 @@ namespace FootballTeamCSharp
             return name + " | " + points + " | " + GoalDifference;
         }
 
+        public void resetFitness()
+        {
+            for(int i = 0; i < players.Count; i++)
+            {
+                players[i].Fitness = 100;
+            }
+        }
+
         public void reset()
         {
+
             points = 0;
             goalsFor = 0;
             goalsAgainst = 0;

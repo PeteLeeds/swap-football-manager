@@ -10,7 +10,7 @@ namespace FootballTeamCSharp
 
         public UserTeam(string name, List<Player> players, League league) : base(name, players, league) {}
 
-        public UserTeam(string name, int high, int low, League league) : base(name, high, low, league) { }
+        public UserTeam(string name, int low, int high, League league) : base(name, low, high, league) { }
 
         public void changeLineup()
         {
