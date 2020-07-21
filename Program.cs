@@ -4,6 +4,8 @@ using System.ComponentModel.Design;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Diagnostics;
+
 
 namespace FootballTeamCSharp
 {
@@ -13,8 +15,8 @@ namespace FootballTeamCSharp
 
         static Random rnd = new Random();
 
-        public static string[] firstNames = System.IO.File.ReadAllLines(@"D:\Names\EnglishFirst.txt");
-        public static string[] lastNames = System.IO.File.ReadAllLines(@"D:\Names\EnglishLast.txt");
+        public static string[] firstNames = System.IO.File.ReadAllLines(@"..\\..\\..\\EnglishFirst.txt");
+        public static string[] lastNames = System.IO.File.ReadAllLines(@"..\\..\\..\\EnglishLast.txt");
         public static string[] positions = { "GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "MID", "FW", "FW",};
 
         public static int checkInputForValidInt(int max)
